@@ -110,3 +110,5 @@ backup/
 json/
 old/
 *config*
+config.*
+config
