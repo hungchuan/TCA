@@ -66,6 +66,7 @@ def waiting_for_update(br,text1):
     return result_info
     
 def waiting_for_TCA_update(br,xpath):
+    button = False
     for i in range(0,5):
         time.sleep(1) 
         log ('waiting for update Count: %d' % i)
@@ -74,6 +75,8 @@ def waiting_for_TCA_update(br,xpath):
         except:
             continue
         break
+    print(xpath)
+    print(button)
     return button    
     
 def download_TCA (br, filename, PACKAGE_DIRECTORY):
@@ -628,10 +631,17 @@ def main (args):
     projdata = []
     
     try:
-       if (args[1]=="debug"):
+        if (args[1]=="debug"):
            log = log_print
     except:
         log = Emptyprintf
+
+    try:
+        if (args[1]=="confirm"):
+            TCA_confirm_all(config)
+            return False    
+    except:
+        print("")    
         
     #sel = input("pause")
                 
@@ -722,6 +732,69 @@ def main (args):
         TCA_backup(download_file)
     print("==============Done==============")
         
+def TCA_confirm_all(config):
+    print("==============TCA_confirm_all==============")
+    config = TCA.read_config (config)
 
+    options = webdriver.ChromeOptions()
+    #prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': directory}
+    #options.add_experimental_option('prefs', prefs)
+    br = webdriver.Chrome(executable_path='D:\Python\Python37-32\chromedriver.exe', chrome_options=options)
+    
+    TCA.login (br, config ['username'], config ['password']) #log in
+    
+    br.get ('https://gsp.tpv-tech.com/RedirectURL.aspx?pg=c&srcgo=Cashout%2fGCS_HomepageForRDDomain.aspx')
+    button = br.find_element_by_xpath('//*[@id="aRDDomain"]')
+    log('button=',button)
+    if (int(button.text)==0):
+        return False
+    
+    button.click() #click 數量   
+    
+    button = waiting_for_TCA_update(br,'//*[@id="btnDownloadAll"]')
+    log('download all=',button)
+    if (button==False):
+        return False
+        
+    button = waiting_for_TCA_update(br,'//*[@id="datagrid-row-r1-2-0"]/td[1]/div/input') # check row 1 exist
+    log('row 1=',button)
+    if (button==False):
+        return False      
+    
+    while (button!=False):      
+        TCA_click_select_all(br)        
+
+        button = waiting_for_TCA_update(br,'//*[@id="datagrid-row-r1-2-0"]/td[1]/div/input') # check row 1 
+        log('row 1=',button)
+        
+        if (button.is_selected()):
+            print("click confirm")
+        else:
+            TCA_click_select_all(br)        
+            
+        
+        button = waiting_for_TCA_update(br,'//*[@id="btnConfirm"]') # btnConfirm
+        log('btnConfirm=',button)    
+        button.click() #click download all
+        time.sleep (5) 
+        button = waiting_for_TCA_update(br,'//*[@id="datagrid-row-r1-2-0"]/td[1]/div/input') # check row 1 exist
+            
+    br.quit ()
+    print("==============TCA_confirm_all_finish==============")
+    return True
+
+def TCA_click_select_all(br):
+    button = waiting_for_TCA_update(br,'//*[@id="content"]/div[1]/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/div/input') # select all
+    log('select all=',button)
+    if (button==False):
+        return False  
+    button.click() #click select all           
+
+    if (button.is_selected()):
+        log("selected")
+    else:
+        button.click() #click select all  
+    
+        
 if __name__ == '__main__':
     main (sys.argv)
