@@ -24,14 +24,14 @@ import xlrd
 
 TCA_URL="https://gsp.tpv-tech.com"
 
-def login (br, username, password):
+def login (br, config):
     print ('Entering Login')
     br.get (TCA_URL + "/Login.aspx")
-    elem_user = br.find_element_by_xpath('//*[@id="txtUserName"]')
-    elem_user.send_keys(username) #瀏覽器版本不匹配的時候這裡可能報錯
-    elem_pwd = br.find_element_by_xpath('//*[@id="txtPassword"]')
-    elem_pwd.send_keys(password)
-    button = br.find_element_by_xpath('//*[@id="btnLogin"]')   
+    elem_user = br.find_element_by_xpath(config ['xpath_username'])
+    elem_user.send_keys(config ['username']) #瀏覽器版本不匹配的時候這裡可能報錯
+    elem_pwd = br.find_element_by_xpath(config ['xpath_password'])
+    elem_pwd.send_keys(config ['password'])
+    button = br.find_element_by_xpath(config ['xpath_log_in'])   
     button.click()
     print ('Leaving Login')
 
@@ -42,7 +42,7 @@ def read_config (config):
     configs = open (config).readlines ()
     print('configs = ',configs)
     for config in configs:
-        (k,v) = config.split ("=")
+        (k,v) = config.split ("==")
         if "USERNAME" == k.strip ():
             retmap ['username'] = v.strip ()
         if "PASSWORD" == k.strip ():
@@ -51,6 +51,31 @@ def read_config (config):
             retmap ['mozilla_profile_path'] = v.strip ()
         if "PROJECT_IDS" == k.strip ():
             retmap ['project_ids'] = v.strip ()
+        if "XPath_username" == k.strip ():
+            retmap ['xpath_username'] = v.strip ()            
+        if "XPath_password" == k.strip ():
+            retmap ['xpath_password'] = v.strip ()             
+        if "XPath_log_in" == k.strip ():
+            retmap ['xpath_log_in'] = v.strip ()             
+        if "XPath_cashout" == k.strip ():
+            retmap ['xpath_cashout'] = v.strip ()                         
+        if "XPath_domain" == k.strip ():
+            retmap ['xpath_domain'] = v.strip ()                         
+        if "XPath_domain_iframe" == k.strip ():
+            retmap ['xpath_domain_iframe'] = v.strip ()             
+        if "XPath_claims" == k.strip ():
+            retmap ['xpath_claims'] = v.strip ()          
+        if "XPath_download_all" == k.strip ():
+            retmap ['xpath_download_all'] = v.strip ()    
+        if "XPath_yes" == k.strip ():
+            retmap ['xpath_yes'] = v.strip ()    
+        if "XPath_row1" == k.strip ():
+           retmap ['xpath_row1'] = v.strip ()    
+        if "XPath_select_all" == k.strip ():
+           retmap ['xpath_select_all'] = v.strip ()    
+        if "XPath_confirm" == k.strip ():
+           retmap ['xpath_confirm'] = v.strip ()    
+            
     return retmap
     
 

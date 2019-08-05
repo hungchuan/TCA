@@ -69,36 +69,47 @@ def waiting_for_TCA_update(br,xpath):
     button = False
     for i in range(0,5):
         time.sleep(1) 
-        log ('waiting for update Count: %d' % i)
+        print ('waiting for update Count: %d' % i)
         try:
             button = br.find_element_by_xpath(xpath)
         except:
             continue
         break
     print(xpath)
-    print(button)
+    print("waiting_for_TCA_update button=",button)
     return button    
     
-def download_TCA (br, filename, PACKAGE_DIRECTORY):
-    #global log
-    #result_info = br.find_by_xpath('//*[@id="sp4"]/b')
-    #log('result_info=',result_info)
+def download_TCA (br, filename, PACKAGE_DIRECTORY, config):
 
-    br.get ('https://gsp.tpv-tech.com/RedirectURL.aspx?pg=c&srcgo=Cashout%2fGCS_HomepageForRDDomain.aspx')
-    button = br.find_element_by_xpath('//*[@id="aRDDomain"]')
+    button = waiting_for_TCA_update(br,config ['xpath_cashout'])
+    time.sleep(5)  
+    button.click() #click cashout   
+    
+    button = waiting_for_TCA_update(br,config ['xpath_domain'])
+    button.click() #click cashout   
+    
+    button = waiting_for_TCA_update(br,config ['xpath_domain_iframe'])
+    br.switch_to.frame(1)
+    
+    button = waiting_for_TCA_update(br,config ['xpath_claims'])
+    
+    #br.get ('https://gsp.tpv-tech.com/RedirectURL.aspx?pg=c&srcgo=Cashout%2fGCS_HomepageForRDDomain.aspx')
+    #button = br.find_element_by_xpath('//*[@id="aRDDomain"]')
     log('button=',button)
     if (int(button.text)==0):
         return False
     
     button.click() #click 數量   
     
-    button = waiting_for_TCA_update(br,'//*[@id="btnDownloadAll"]')
+    button = waiting_for_TCA_update(br,config ['xpath_download_all'])
     log('download all=',button)
     button.click() #click download all
 
-    button = waiting_for_TCA_update(br,'//*[@id="confirmBox"]/div[2]/a[2]/span/span')
+    button = waiting_for_TCA_update(br,config ['xpath_yes'])
     log('yes = ',button)
     button.click() #click yes   
+    
+    sel = input("pause")    
     
     return button     
     
@@ -436,9 +447,9 @@ def file_download (directory,config):
     options.add_experimental_option('prefs', prefs)
     br = webdriver.Chrome(executable_path='D:\Python\Python37-32\chromedriver.exe', chrome_options=options)
     
-    TCA.login (br, config ['username'], config ['password'])
+    TCA.login (br, config)
     #time.sleep(30) 
-    download_result = download_TCA(br,PROBLEM,directory)  
+    download_result = download_TCA(br,PROBLEM,directory,config)  
     if (download_result==False):
         download_file = False
     else:
@@ -641,7 +652,7 @@ def main (args):
             TCA_confirm_all(config)
             return False    
     except:
-        print("")    
+        print("")
         
     #sel = input("pause")
                 
@@ -740,51 +751,62 @@ def TCA_confirm_all(config):
     #prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': directory}
     #options.add_experimental_option('prefs', prefs)
     br = webdriver.Chrome(executable_path='D:\Python\Python37-32\chromedriver.exe', chrome_options=options)
+
+    TCA.login (br, config) #log in
+
+    button = waiting_for_TCA_update(br,config ['xpath_cashout'])
+    time.sleep(5)       
+    button.click() #click cashout   
+    button = waiting_for_TCA_update(br,config ['xpath_domain'])
+    button.click() #click cashout   
+    button = waiting_for_TCA_update(br,config ['xpath_domain_iframe'])
+    br.switch_to.frame(1)
     
-    TCA.login (br, config ['username'], config ['password']) #log in
+    button = waiting_for_TCA_update(br,config ['xpath_claims'])
     
-    br.get ('https://gsp.tpv-tech.com/RedirectURL.aspx?pg=c&srcgo=Cashout%2fGCS_HomepageForRDDomain.aspx')
-    button = br.find_element_by_xpath('//*[@id="aRDDomain"]')
+    #br.get ('https://gsp.tpv-tech.com/RedirectURL.aspx?pg=c&srcgo=Cashout%2fGCS_HomepageForRDDomain.aspx')
+    #button = br.find_element_by_xpath('//*[@id="aRDDomain"]')
     log('button=',button)
     if (int(button.text)==0):
         return False
     
-    button.click() #click 數量   
-    
-    button = waiting_for_TCA_update(br,'//*[@id="btnDownloadAll"]')
+    button.click() #click 數量     
+   
+    button = waiting_for_TCA_update(br,config ['xpath_download_all'])
     log('download all=',button)
     if (button==False):
         return False
         
-    button = waiting_for_TCA_update(br,'//*[@id="datagrid-row-r1-2-0"]/td[1]/div/input') # check row 1 exist
+    button = waiting_for_TCA_update(br,config ['xpath_row1']) # check row 1 exist
     log('row 1=',button)
     if (button==False):
         return False      
     
     while (button!=False):      
-        TCA_click_select_all(br)        
+        TCA_click_select_all(br,config)        
 
-        button = waiting_for_TCA_update(br,'//*[@id="datagrid-row-r1-2-0"]/td[1]/div/input') # check row 1 
+        button = waiting_for_TCA_update(br,config ['xpath_row1']) # check row 1 exist
         log('row 1=',button)
         
         if (button.is_selected()):
             print("click confirm")
         else:
-            TCA_click_select_all(br)        
+            TCA_click_select_all(br,config)        
             
         
-        button = waiting_for_TCA_update(br,'//*[@id="btnConfirm"]') # btnConfirm
-        log('btnConfirm=',button)    
-        button.click() #click download all
-        time.sleep (5) 
-        button = waiting_for_TCA_update(br,'//*[@id="datagrid-row-r1-2-0"]/td[1]/div/input') # check row 1 exist
+        button = waiting_for_TCA_update(br,config ['xpath_confirm']) # btnConfirm  
+        log('btnConfirm=',button)   
+        sel = input("pause")        
+        button.click() #click confirm 
+        time.sleep (5)         
+        button = waiting_for_TCA_update(br,config ['xpath_row1']) # check row 1 exist 
             
     br.quit ()
     print("==============TCA_confirm_all_finish==============")
     return True
 
-def TCA_click_select_all(br):
-    button = waiting_for_TCA_update(br,'//*[@id="content"]/div[1]/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/div/input') # select all
+def TCA_click_select_all(br,config):
+    button = waiting_for_TCA_update(br,config ['xpath_select_all']) # select all
     log('select all=',button)
     if (button==False):
         return False  
