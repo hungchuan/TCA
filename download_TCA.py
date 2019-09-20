@@ -32,11 +32,18 @@ def Google_Translator(src_in,dest_in,df_in):
     translator = Translator()
     # src來源語言，dest要翻譯語言，如果要找其他語言可以參考說明文件
     n=0 
-    str="sorun : tv açılmamaktadır cevap : servise yönlendirildi"      
+    str="sorun : tv açılmamaktadır cevap : servise yönlendirildi"   
+    str_out=translator.translate(str, src = src_in, dest = dest_in)
+    print(str_out.text)
     for i in df_in:         
         #if (isNaN(df_in[n])==False):   
-        if (len(df_in[n])>1):      
-            str_out=translator.translate(df_in[n], src = src_in, dest = dest_in)
+        if (len(df_in[n])>1):  
+            print(df_in[n])  
+            try:
+                str_out=translator.translate(df_in[n], src = src_in, dest = dest_in)
+            except:    
+                n=n;            
+
             df_in[n] = str_out.text
         n=n+1    
     #print(str_out.text)
@@ -109,7 +116,7 @@ def download_TCA (br, filename, PACKAGE_DIRECTORY, config):
     log('yes = ',button)
     button.click() #click yes   
     
-    sel = input("pause")    
+    #sel = input("pause")    
     
     return button     
     
@@ -454,7 +461,7 @@ def file_download (directory,config):
         download_file = False
     else:
         download_file = TCA_get_filename(directory)    
-        
+    time.sleep(3) 
     br.quit ()
     return download_file
 
@@ -462,6 +469,7 @@ def filter_fault_description(df_in):
     df_in = df_in.str.replace("\n"," ")
     df_in = df_in.str.replace("\r"," ")
     df_in = df_in.str.replace("<br/>"," ")
+    df_in = df_in.str.replace("&"," ")
     
     find_index = df_in.str.find("[symptom description]")
     
@@ -672,7 +680,9 @@ def main (args):
         download_file = file_download(PACKAGE_DIRECTORY,config) #下載TCA檔案
     else:    
         download_file=True
-        
+    
+    #sel = input("pause-680")    
+    
     if (download_file==False):
         print("=================No claim in TCA=================")
         return False    
@@ -796,7 +806,7 @@ def TCA_confirm_all(config):
         
         button = waiting_for_TCA_update(br,config ['xpath_confirm']) # btnConfirm  
         log('btnConfirm=',button)   
-        sel = input("pause")        
+        #sel = input("pause")        
         button.click() #click confirm 
         time.sleep (5)         
         button = waiting_for_TCA_update(br,config ['xpath_row1']) # check row 1 exist 
