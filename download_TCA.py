@@ -4,7 +4,7 @@ import os
 import sys
 import re
 import xlrd
-import splinter
+#import splinter
 import tca as TCA #URT
 import time
 import pandas as pd
@@ -74,7 +74,7 @@ def waiting_for_update(br,text1):
     
 def waiting_for_TCA_update(br,xpath):
     button = False
-    for i in range(0,5):
+    for i in range(0,10):
         time.sleep(1) 
         print ('waiting for update Count: %d' % i)
         try:
@@ -96,6 +96,7 @@ def download_TCA (br, filename, PACKAGE_DIRECTORY, config):
     button.click() #click cashout   
     
     button = waiting_for_TCA_update(br,config ['xpath_domain_iframe'])
+    time.sleep(5)  
     br.switch_to.frame(1)
     
     button = waiting_for_TCA_update(br,config ['xpath_claims'])
@@ -103,6 +104,8 @@ def download_TCA (br, filename, PACKAGE_DIRECTORY, config):
     #br.get ('https://gsp.tpv-tech.com/RedirectURL.aspx?pg=c&srcgo=Cashout%2fGCS_HomepageForRDDomain.aspx')
     #button = br.find_element_by_xpath('//*[@id="aRDDomain"]')
     log('button=',button)
+    print('button=',button)
+    print('button=',button.text)
     if (int(button.text)==0):
         return False
     
@@ -448,11 +451,15 @@ def file_download (directory,config):
             print("目錄已存在。")    
     
     config = TCA.read_config (config)
+	
+    #CURRENT_PACKAGE_DIRECTORY = os.path.abspath('.')   
+    #selenium_driver_chrome = CURRENT_PACKAGE_DIRECTORY + '\chromedriver.exe'     	
 
     options = webdriver.ChromeOptions()
     prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': directory}
     options.add_experimental_option('prefs', prefs)
-    br = webdriver.Chrome(executable_path='D:\Python\Python37-32\chromedriver.exe', chrome_options=options)
+    #br = webdriver.Chrome(executable_path='D:\Python\Python37-32\chromedriver.exe', chrome_options=options)
+    br = webdriver.Chrome(chrome_options=options)
     
     TCA.login (br, config)
     #time.sleep(30) 
@@ -673,6 +680,16 @@ def main (args):
     CURRENT_PACKAGE_DIRECTORY = os.path.abspath('.')    
     PACKAGE_DIRECTORY = CURRENT_PACKAGE_DIRECTORY + '\download' 
     Backup_DIRECTORY = CURRENT_PACKAGE_DIRECTORY + '\\backup' 
+	
+    if os.path.exists(Backup_DIRECTORY):
+        print("backup目錄已存在。")   	
+    else:       
+        # 使用 try 建立目錄
+        try:
+            os.makedirs(Backup_DIRECTORY)
+        # 檔案已存在的例外處理
+        except FileExistsError:
+            print("backup目錄已存在目錄已存在。")   	
     
     download_file=False
     is_analysis_file_exist=TCA_is_analysis_file_exist()
@@ -760,7 +777,8 @@ def TCA_confirm_all(config):
     options = webdriver.ChromeOptions()
     #prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': directory}
     #options.add_experimental_option('prefs', prefs)
-    br = webdriver.Chrome(executable_path='D:\Python\Python37-32\chromedriver.exe', chrome_options=options)
+    #br = webdriver.Chrome(executable_path='D:\Python\Python37-32\chromedriver.exe', chrome_options=options)
+    br = webdriver.Chrome(chrome_options=options)
 
     TCA.login (br, config) #log in
 
@@ -770,6 +788,7 @@ def TCA_confirm_all(config):
     button = waiting_for_TCA_update(br,config ['xpath_domain'])
     button.click() #click cashout   
     button = waiting_for_TCA_update(br,config ['xpath_domain_iframe'])
+    time.sleep(5)  
     br.switch_to.frame(1)
     
     button = waiting_for_TCA_update(br,config ['xpath_claims'])
