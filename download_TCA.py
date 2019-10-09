@@ -669,7 +669,7 @@ def main (args):
     except:
         print("")
         
-    #sel = input("pause")
+    sel = input("pause")
                 
     now = datetime.now()
     date= now.strftime("%Y")+now.strftime("%m")+now.strftime("%d")    
@@ -786,12 +786,20 @@ def TCA_confirm_all(config):
     time.sleep(5)       
     button.click() #click cashout   
     button = waiting_for_TCA_update(br,config ['xpath_domain'])
-    button.click() #click cashout   
+    button.click() #click domain   
+    print('wait 5 seconds................')
+    time.sleep(5)          
     button = waiting_for_TCA_update(br,config ['xpath_domain_iframe'])
-    time.sleep(5)  
+    print(button.text)
+    #sel = input("pause-792")    
     br.switch_to.frame(1)
-    
+    print('wait 5 seconds................')
+    time.sleep(5)       
     button = waiting_for_TCA_update(br,config ['xpath_claims'])
+    #sel = input("pause-796")     
+    print('claims=',button.text)
+    #sel = input("pause-798")    
+    #br.switch_to.frame(1)
     
     #br.get ('https://gsp.tpv-tech.com/RedirectURL.aspx?pg=c&srcgo=Cashout%2fGCS_HomepageForRDDomain.aspx')
     #button = br.find_element_by_xpath('//*[@id="aRDDomain"]')
