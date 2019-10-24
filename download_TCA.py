@@ -11,6 +11,7 @@ import pandas as pd
 import pygsheets
 import numpy as np
 import shutil 
+import pdb
 from selenium import webdriver
 from googletrans import Translator
 from datetime import datetime, date, timedelta
@@ -213,6 +214,7 @@ def TCA_upload_to_google(file, sheet, TCA_df):
     wks.set_dataframe(En_df, (1, 1))
     '''
     return wks    
+
 
 def TCA_download_from_google(file, sheet):
 
@@ -709,6 +711,13 @@ def main (args):
         return False    
 
     current_df=TCA_download_from_google('TCA2','raw data2') 
+    TCA_upload_to_google('TCA2','raw data2_backup',current_df) # upload to google sheet
+
+    df_zero=current_df.copy()
+    for col in df_zero.columns: 
+        df_zero[col]="" 
+    TCA_upload_to_google('TCA2','raw data2',df_zero) # upload to google sheet    
+
     current_df['Claim RD Review Date']=pd.to_datetime(current_df['Claim RD Review Date'])
     log("current_df=",current_df['Claim RD Review Date'])    
     log("time_end = ",time_end)    
@@ -768,6 +777,9 @@ def main (args):
     TCA_new2_df = TCA_new_df[ TCA_new_df['Claim RD Review Date'] > time_begin]
     log(TCA_new2_df['Claim RD Review Date'])
     TCA_new2_df=TCA_new2_df.fillna("")   
+    #pdb.set_trace() 
+    #TCA_upload_to_google('TCA2','raw data2',df_zero) # upload to google sheet
+    #pdb.set_trace() 
     TCA_upload_to_google('TCA2','raw data2',TCA_new2_df) # upload to google sheet
     
     if (is_analysis_file_exist==False):
