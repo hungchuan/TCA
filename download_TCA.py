@@ -466,7 +466,12 @@ def file_download (directory,config):
     prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': directory}
     options.add_experimental_option('prefs', prefs)
     #br = webdriver.Chrome(executable_path='D:\Python\Python37-32\chromedriver.exe', chrome_options=options)
-    br = webdriver.Chrome(chrome_options=options)
+    if (os.path.isfile ('c:\chromedriver.exe')):
+        print('c:\chromedriver.exe')
+        br = webdriver.Chrome(executable_path='c:\chromedriver.exe', chrome_options=options)
+    else:
+        print('False')    
+        br = webdriver.Chrome(chrome_options=options)
     
     TCA.login (br, config)
     #time.sleep(30) 
@@ -799,7 +804,12 @@ def TCA_confirm_all(config):
     #prefs = {'profile.default_content_settings.popups': 0, 'download.default_directory': directory}
     #options.add_experimental_option('prefs', prefs)
     #br = webdriver.Chrome(executable_path='D:\Python\Python37-32\chromedriver.exe', chrome_options=options)
-    br = webdriver.Chrome(chrome_options=options)
+    if (os.path.isfile ('c:\chromedriver.exe')):
+        print('c:\chromedriver.exe')
+        br = webdriver.Chrome(executable_path='c:\chromedriver.exe', chrome_options=options)
+    else:
+        print('False')    
+        br = webdriver.Chrome(chrome_options=options)
 
     TCA.login (br, config) #log in
 
