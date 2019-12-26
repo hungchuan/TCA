@@ -16,6 +16,7 @@ from selenium import webdriver
 from googletrans import Translator
 from datetime import datetime, date, timedelta
 from print_log import log_print,Emptyprintf
+from fnmatch import fnmatch, fnmatchcase
 
 #PROJECT_IDS = [1429]
 # PROJECT_IDS = [712, 746, 750]
@@ -558,15 +559,19 @@ def TCA_check_symptom(df_in):
         n=n+1  
     
     for i in range(0, len(df_in)):  
+        print("df_in=",df_in[i])
         for j in range(0, len(symptom_keyword_df)):
             srt = symptom_keyword_df2[j]
             srt=str(srt)
+            srt="*"+srt+"*"
             #print("srt=",srt)
             #print("m,n=",j,i)
-            if (df_in[i].find(srt)>=0):
-                #print("symptom_df=",symptom_df[j])
+            #if (df_in[i].find(srt)>=0):
+            if (fnmatch(df_in[i], srt)):
+                print("j=",j)
+                print("symptom_df=",symptom_df[j])
                 symptom_out_df[i]=symptom_df[j]
-                #sel = input("pause")
+                sel = input("pause")
                 break
 
     return symptom_out_df 
