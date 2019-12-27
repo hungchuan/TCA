@@ -576,7 +576,7 @@ def TCA_check_symptom(df_in):
                 print("j=",j)
                 print("symptom_df=",symptom_df[j])
                 symptom_out_df[i]=symptom_df[j]
-                sel = input("pause")
+                #sel = input("pause")
                 break
 
     return symptom_out_df 
